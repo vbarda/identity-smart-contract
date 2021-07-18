@@ -18,7 +18,7 @@ contract Registrar {
 
     event PersonRegistered(uint id);
     event ViewerAuthorized(uint id, address viewer);
-    event PersonTransfered(uint id, address fromAddress, address toAddress);
+    event PersonTransferred(uint id, address fromAddress, address toAddress);
 
     struct Person {
         uint id;
@@ -118,6 +118,7 @@ contract Registrar {
     }
     
     function transfer(address to) external userExists {
+        require(addressToUserId[to] == 0, "User already registered for this address.");
         require(isApprovedForTransfer(msg.sender), "Not approved for transfer.");
         uint id = addressToUserId[msg.sender];
         // transfer ID
@@ -129,7 +130,7 @@ contract Registrar {
             delete addressToSignatoryTransferApprovalTimestamp[msg.sender][transferApprovals[i].signatory];    
         }
         delete addressToTransferApprovals[msg.sender];
-        emit PersonTransfered(id, msg.sender, to);
+        emit PersonTransferred(id, msg.sender, to);
         // NOTE: since signatories & viewers are specified per user ID, 
         // and not per address, no further writes are necessary
     }
